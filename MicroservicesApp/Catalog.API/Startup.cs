@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Catalog.API.Data;
 using Catalog.API.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace Catalog.API
 {
@@ -36,6 +38,12 @@ namespace Catalog.API
             services.Configure<CatalogDatabaseSettings>(Configuration.GetSection(CatalogDatabaseSettings.SETTINGS_NAME));
             services.AddSingleton<ICatalogDatabaseSettings>(sp => 
                 sp.GetRequiredService<IOptionsMonitor<CatalogDatabaseSettings>>().CurrentValue);
+
+            // NOTE_JBOY: "It is recommended to store a MongoClient instance in a global place, 
+            // either as a static variable or in an IoC container with a singleton lifetime." - https://stackoverflow.com/questions/59599151/mongodb-service-singleton-or-scoped
+            services.AddSingleton<IMongoClient>(sp =>
+                new MongoClient(sp.GetRequiredService<IOptionsMonitor<CatalogDatabaseSettings>>().CurrentValue.ConnectionString));
+            services.AddScoped<CatalogDataContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
