@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,10 @@ namespace Catalog.API.Entities
     public class Product
     {
         [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)] // NOTE_JBOY: BsonType.ObjectId means that this is an identity column
         public string Id { get; set; }
+
+        [BsonElement("Name")]
         public string Name { get; set; }
         public string Category { get; set; }
         public string Summary { get; set; }
